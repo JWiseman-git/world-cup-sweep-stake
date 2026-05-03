@@ -7,6 +7,7 @@ function makeInitialState() {
   return {
     page: 'draw',
     playerOrder: shuffle([...PLAYERS]),
+    pickSequence: [0, 1, 2, 3].flatMap(() => shuffle([...PLAYERS])),
     // picks[player][tierId] = countryName
     picks: Object.fromEntries(PLAYERS.map(p => [p, {}])),
     // countryPicks[country] = times picked so far
@@ -44,7 +45,7 @@ function reducer(state, action) {
       const idx = state.currentPickIdx;
       const tierIdx = Math.floor(idx / NUM_PLAYERS);
       const tierId = TIERS[tierIdx].id;
-      const player = state.playerOrder[idx % NUM_PLAYERS];
+      const player = state.pickSequence[idx];
       const country = state.currentResult;
 
       const newPicks = {
@@ -83,11 +84,11 @@ export default function App() {
     const idx = state.currentPickIdx;
     const tierIdx = Math.min(Math.floor(idx / NUM_PLAYERS), TIERS.length - 1);
     const playerIdx = idx % NUM_PLAYERS;
-    const currentPlayer = state.playerOrder[playerIdx];
+    const currentPlayer = state.pickSequence[idx] ?? state.playerOrder[playerIdx];
     const currentTier = TIERS[tierIdx];
     const totalDone = idx;
     return { tierIdx, playerIdx, currentPlayer, currentTier, totalDone };
-  }, [state.currentPickIdx, state.playerOrder]);
+  }, [state.currentPickIdx, state.playerOrder, state.pickSequence]);
 
   return (
     <div style={{ minHeight: '100vh', background: '#ececec' }}>

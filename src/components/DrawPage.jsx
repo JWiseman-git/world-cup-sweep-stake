@@ -1,25 +1,6 @@
-import { useRef, useCallback } from 'react';
-import { TIERS, FLAGS, C, stockTone, MAX_PICKS_PER_COUNTRY, NUM_PLAYERS, TOTAL_PICKS } from '../data.js';
-
-// ─── helpers ────────────────────────────────────────────────────────────────
-
-function Flag({ country, size = 14 }) {
-  const emoji = FLAGS[country];
-  if (emoji) {
-    return (
-      <span style={{ fontSize: size, lineHeight: 1, marginRight: 6, flexShrink: 0 }}>
-        {emoji}
-      </span>
-    );
-  }
-  return (
-    <span style={{
-      display: 'inline-block', width: size * 1.4, height: size,
-      background: 'repeating-linear-gradient(90deg, #d8d8d8 0 4px, #ececec 4px 8px)',
-      border: '1px solid ' + C.ink, verticalAlign: '-2px', marginRight: 6, flexShrink: 0,
-    }} />
-  );
-}
+import { useRef, useCallback, useEffect } from 'react';
+import { TIERS, C, stockTone, MAX_PICKS_PER_COUNTRY, NUM_PLAYERS, TOTAL_PICKS } from '../data.js';
+import Flag from './Flag.jsx';
 
 function mono(extra = {}) {
   return { fontFamily: "'JetBrains Mono', ui-monospace, monospace", ...extra };
@@ -29,7 +10,7 @@ function mono(extra = {}) {
 
 function PieWheel({ countries, countryPicks, rotation, isSpinning, resultCountry }) {
   const n = countries.length;
-  const size = 210;
+  const size = 340;
   const r = size / 2;
   const cx = r, cy = r;
 
@@ -43,14 +24,31 @@ function PieWheel({ countries, countryPicks, rotation, isSpinning, resultCountry
     const remaining = MAX_PICKS_PER_COUNTRY - (countryPicks[country] || 0);
     const tone = stockTone(remaining);
     const isResult = country === resultCountry && !isSpinning;
+    const aMid = (i + 0.5) / n * Math.PI * 2 - Math.PI / 2;
+    const tx = cx + r * 0.62 * Math.cos(aMid);
+    const ty = cy + r * 0.62 * Math.sin(aMid);
+    const rotate = (aMid * 180) / Math.PI;
     return (
-      <path
-        key={country}
-        d={`M${cx},${cy} L${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1} Z`}
-        fill={isResult ? C.accent : tone.bg}
-        stroke={C.ink}
-        strokeWidth="1"
-      />
+      <g key={country}>
+        <path
+          d={`M${cx},${cy} L${x0},${y0} A${r},${r} 0 0 1 ${x1},${y1} Z`}
+          fill={isResult ? C.accent : tone.bg}
+          stroke={C.ink}
+          strokeWidth="1"
+        />
+        <text
+          x={tx} y={ty}
+          textAnchor="middle"
+          dominantBaseline="middle"
+          transform={`rotate(${rotate}, ${tx}, ${ty})`}
+          fontSize={10}
+          fontFamily="JetBrains Mono, monospace"
+          fill={remaining === 0 ? C.ink3 : C.ink}
+          style={{ pointerEvents: 'none', userSelect: 'none' }}
+        >
+          {country}
+        </text>
+      </g>
     );
   });
 
@@ -86,6 +84,7 @@ function PieWheel({ countries, countryPicks, rotation, isSpinning, resultCountry
 
 export default function DrawPage({ state, dispatch, derived }) {
   const spinTimeoutRef = useRef(null);
+  const activePlayerRef = useRef(null);
   const { currentPlayer, currentTier, totalDone } = derived;
   const { picks, countryPicks, wheelRotation, wheelSpinning, currentResult, drawComplete, playerOrder } = state;
 
@@ -122,10 +121,14 @@ export default function DrawPage({ state, dispatch, derived }) {
     dispatch({ type: 'CONFIRM' });
   }, [currentResult, wheelSpinning, dispatch]);
 
+  useEffect(() => {
+    activePlayerRef.current?.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  }, [state.currentPickIdx]);
+
   const tierPicksDone = Math.min(totalDone, (derived.tierIdx + 1) * NUM_PLAYERS);
 
   return (
-    <div style={{ padding: 16, minHeight: '100vh', display: 'flex', flexDirection: 'column', gap: 12 }}>
+    <div style={{ padding: 16, height: '100vh', overflow: 'hidden', display: 'flex', flexDirection: 'column', gap: 12, boxSizing: 'border-box' }}>
 
       {/* top bar */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '10px 16px', background: C.paper, border: '1px solid ' + C.ink }}>
@@ -161,7 +164,7 @@ export default function DrawPage({ state, dispatch, derived }) {
       </div>
 
       {/* main 3-panel */}
-      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '300px 1fr 360px', gap: 12, minHeight: 0 }}>
+      <div style={{ flex: 1, display: 'grid', gridTemplateColumns: '570px 1fr 440px', gap: 12, minHeight: 0 }}>
 
         {/* LEFT — players */}
         <div style={{ background: C.paper, border: '1px solid ' + C.ink, padding: 12, display: 'flex', flexDirection: 'column', gap: 10, overflow: 'hidden' }}>
@@ -170,12 +173,12 @@ export default function DrawPage({ state, dispatch, derived }) {
             <div style={{ ...mono(), fontSize: 10, color: C.ink3 }}>random order</div>
           </div>
           <hr style={{ border: 0, borderTop: '1px dashed ' + C.line2 }} />
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, overflowY: 'auto', flex: 1, minHeight: 0 }}>
             {playerOrder.map((player, i) => {
               const isCurrent = player === currentPlayer && !drawComplete;
               const playerPicks = picks[player] || {};
               return (
-                <div key={player} style={{
+                <div key={player} ref={isCurrent ? activePlayerRef : null} style={{
                   border: isCurrent ? '1.5px solid ' + C.ink : '1px solid ' + C.line,
                   padding: '8px 10px',
                   background: isCurrent ? C.accentSoft : C.paper,
@@ -198,7 +201,7 @@ export default function DrawPage({ state, dispatch, derived }) {
                       if (assigned) {
                         return (
                           <span key={tier.id} style={{ fontSize: 11, border: '1px solid ' + C.line, padding: '2px 6px', background: '#fff', display: 'inline-flex', alignItems: 'center' }}>
-                            <Flag country={assigned} size={11} />{assigned}
+                            <Flag country={assigned} size={11} style={{ marginRight: 4 }} />{assigned}
                           </span>
                         );
                       }
@@ -258,7 +261,7 @@ export default function DrawPage({ state, dispatch, derived }) {
                           background: tone.bg, border: '1px solid ' + tone.line,
                         }}>
                           <span style={{ display: 'inline-flex', alignItems: 'center', color: remaining === 0 ? C.ink3 : C.ink, textDecoration: remaining === 0 ? 'line-through' : 'none' }}>
-                            <Flag country={country} size={12} />{country}
+                            <Flag country={country} size={12} style={{ marginRight: 4 }} />{country}
                           </span>
                           <span style={{ ...mono(), fontSize: 10, color: tone.fg, fontWeight: 600 }}>
                             ×{remaining}{remaining === 1 ? ' · last' : remaining === 0 ? '' : ' left'}
@@ -307,7 +310,7 @@ export default function DrawPage({ state, dispatch, derived }) {
           <div style={{ border: '1.5px solid ' + C.ink, background: C.paper, padding: 12, display: 'flex', alignItems: 'center', gap: 14, minHeight: 80 }}>
             {currentResult ? (
               <>
-                <span style={{ fontSize: 52, lineHeight: 1, flexShrink: 0 }}>{FLAGS[currentResult] || '🏳'}</span>
+                <Flag country={currentResult} size={52} style={{ borderRadius: 4 }} />
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ ...mono(), fontSize: 10, color: C.ink3, letterSpacing: '0.12em' }}>RESULT</div>
                   <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.01em', lineHeight: 1.1 }}>{currentResult}</div>

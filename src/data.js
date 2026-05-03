@@ -1,48 +1,75 @@
 export const PLAYERS = [
-  'Alex', 'Bea', 'Cai', 'Dani', 'Eli', 'Fran', 'Gus', 'Hana',
-  'Ines', 'Jo', 'Kim', 'Leo', 'Mae', 'Nik', 'Owe', 'Pat',
+  'Alex', 'Bea', 'Cai', 'Dani',
 ];
 
 export const TIERS = [
-  { id: 1, label: 'Tier 1', sub: 'Favourites',  countries: ['Brazil','Argentina','France','England','Spain','Germany','Portugal','Netherlands'] },
-  { id: 2, label: 'Tier 2', sub: 'Contenders',  countries: ['Italy','Belgium','Croatia','Uruguay','Denmark','Switzerland','Mexico','USA'] },
-  { id: 3, label: 'Tier 3', sub: 'Outsiders',   countries: ['Japan','S. Korea','Senegal','Morocco','Poland','Serbia','Ecuador','Australia'] },
-  { id: 4, label: 'Tier 4', sub: 'Long shots',  countries: ['Iran','Tunisia','Cameroon','Ghana','Saudi Arabia','Qatar','Costa Rica','Canada'] },
+  { id: 1, label: 'Tier 1', sub: 'Favourites', countries: [
+    'Argentina','France','Brazil','Spain','England','Germany',
+    'Portugal','Netherlands','Italy','Colombia','Morocco','USA',
+  ]},
+  { id: 2, label: 'Tier 2', sub: 'Contenders', countries: [
+    'Uruguay','Croatia','Belgium','Turkey','Denmark','Japan',
+    'Mexico','Ecuador','S. Korea','Austria','Senegal','Serbia',
+  ]},
+  { id: 3, label: 'Tier 3', sub: 'Outsiders', countries: [
+    'Paraguay','Switzerland','Poland','Nigeria','Iran','Australia',
+    'Egypt','S. Africa','Saudi Arabia','Canada','Ivory Coast','DR Congo',
+  ]},
+  { id: 4, label: 'Tier 4', sub: 'Long shots', countries: [
+    'Tunisia','Iraq','Jordan','Mali','Costa Rica','Panama',
+    'Honduras','New Zealand','Venezuela','Scotland','Hungary','Uzbekistan',
+  ]},
 ];
 
 export const FLAGS = {
-  'Brazil':       '🇧🇷',
   'Argentina':    '🇦🇷',
   'France':       '🇫🇷',
-  'England':      '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+  'Brazil':       '🇧🇷',
   'Spain':        '🇪🇸',
+  'England':      '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
   'Germany':      '🇩🇪',
   'Portugal':     '🇵🇹',
   'Netherlands':  '🇳🇱',
   'Italy':        '🇮🇹',
-  'Belgium':      '🇧🇪',
-  'Croatia':      '🇭🇷',
-  'Uruguay':      '🇺🇾',
-  'Denmark':      '🇩🇰',
-  'Switzerland':  '🇨🇭',
-  'Mexico':       '🇲🇽',
-  'USA':          '🇺🇸',
-  'Japan':        '🇯🇵',
-  'S. Korea':     '🇰🇷',
-  'Senegal':      '🇸🇳',
+  'Colombia':     '🇨🇴',
   'Morocco':      '🇲🇦',
-  'Poland':       '🇵🇱',
-  'Serbia':       '🇷🇸',
+  'USA':          '🇺🇸',
+  'Uruguay':      '🇺🇾',
+  'Croatia':      '🇭🇷',
+  'Belgium':      '🇧🇪',
+  'Turkey':       '🇹🇷',
+  'Denmark':      '🇩🇰',
+  'Japan':        '🇯🇵',
+  'Mexico':       '🇲🇽',
   'Ecuador':      '🇪🇨',
-  'Australia':    '🇦🇺',
+  'S. Korea':     '🇰🇷',
+  'Austria':      '🇦🇹',
+  'Senegal':      '🇸🇳',
+  'Serbia':       '🇷🇸',
+  'Paraguay':     '🇵🇾',
+  'Switzerland':  '🇨🇭',
+  'Poland':       '🇵🇱',
+  'Nigeria':      '🇳🇬',
   'Iran':         '🇮🇷',
-  'Tunisia':      '🇹🇳',
-  'Cameroon':     '🇨🇲',
-  'Ghana':        '🇬🇭',
+  'Australia':    '🇦🇺',
+  'Egypt':        '🇪🇬',
+  'S. Africa':    '🇿🇦',
   'Saudi Arabia': '🇸🇦',
-  'Qatar':        '🇶🇦',
-  'Costa Rica':   '🇨🇷',
   'Canada':       '🇨🇦',
+  'Ivory Coast':  '🇨🇮',
+  'DR Congo':     '🇨🇩',
+  'Tunisia':      '🇹🇳',
+  'Iraq':         '🇮🇶',
+  'Jordan':       '🇯🇴',
+  'Mali':         '🇲🇱',
+  'Costa Rica':   '🇨🇷',
+  'Panama':       '🇵🇦',
+  'Honduras':     '🇭🇳',
+  'New Zealand':  '🇳🇿',
+  'Venezuela':    '🇻🇪',
+  'Scotland':     '🏴󠁧󠁢󠁳󠁣󠁴󠁿',
+  'Hungary':      '🇭🇺',
+  'Uzbekistan':   '🇺🇿',
 };
 
 export const POINT_RULES = [
@@ -77,7 +104,7 @@ export const C = {
 };
 
 export function stockTone(remaining) {
-  if (remaining >= 3) return C.stockOk;
+  if (remaining === 3) return C.stockOk;
   if (remaining === 2) return C.stockMid;
   if (remaining === 1) return C.stockLow;
   return C.stockGone;
@@ -92,6 +119,26 @@ export function shuffle(arr) {
   return a;
 }
 
-export const MAX_PICKS_PER_COUNTRY = 4;
+export const COUNTRY_CODES = {
+  'Argentina': 'ar', 'France': 'fr', 'Brazil': 'br', 'Spain': 'es',
+  'England': 'gb-eng', 'Germany': 'de', 'Portugal': 'pt', 'Netherlands': 'nl',
+  'Italy': 'it', 'Colombia': 'co', 'Morocco': 'ma', 'USA': 'us',
+  'Uruguay': 'uy', 'Croatia': 'hr', 'Belgium': 'be', 'Turkey': 'tr',
+  'Denmark': 'dk', 'Japan': 'jp', 'Mexico': 'mx', 'Ecuador': 'ec',
+  'S. Korea': 'kr', 'Austria': 'at', 'Senegal': 'sn', 'Serbia': 'rs',
+  'Paraguay': 'py', 'Switzerland': 'ch', 'Poland': 'pl', 'Nigeria': 'ng',
+  'Iran': 'ir', 'Australia': 'au', 'Egypt': 'eg', 'S. Africa': 'za',
+  'Saudi Arabia': 'sa', 'Canada': 'ca', 'Ivory Coast': 'ci', 'DR Congo': 'cd',
+  'Tunisia': 'tn', 'Iraq': 'iq', 'Jordan': 'jo', 'Mali': 'ml',
+  'Costa Rica': 'cr', 'Panama': 'pa', 'Honduras': 'hn', 'New Zealand': 'nz',
+  'Venezuela': 've', 'Scotland': 'gb-sct', 'Hungary': 'hu', 'Uzbekistan': 'uz',
+};
+
+export function flagUrl(country, width = 40) {
+  const code = COUNTRY_CODES[country];
+  return code ? `https://flagcdn.com/w${width}/${code}.png` : null;
+}
+
+export const MAX_PICKS_PER_COUNTRY = 3;
 export const NUM_PLAYERS = PLAYERS.length; // 16
 export const TOTAL_PICKS = NUM_PLAYERS * TIERS.length; // 64

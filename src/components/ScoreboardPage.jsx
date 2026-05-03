@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { C, POINT_RULES, FLAGS } from '../data.js';
+import { C, POINT_RULES } from '../data.js';
 
 // ─── design tokens ───────────────────────────────────────────────────────────
 
